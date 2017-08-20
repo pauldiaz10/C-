@@ -1,0 +1,319 @@
+// Paul Williams Diaz
+// pauldia@my.smcc.edu
+// CIS 278 C++ 
+// Project 3 Concert
+// Prof. Stacey Grasso
+// 02/25/13
+
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <cstring>
+
+using namespace std;
+
+int main() 
+{
+    int const MAXSEATS = 10;
+    int  array [MAXSEATS] = {5,4,6,7,10,2};
+    int choice, seat, cancel;
+    string v, t;
+    
+    bool soldOut(int seats[], int size);
+    int seatsLeft(int seats[], int size);
+    bool validSeatNum(int seatNo, int size);
+    bool seatVacant(int seatNo, int seats[]);
+    bool reserveSeat(int seatNo, int seats[], int size);
+    int furthestFront(int seats[], int size);
+    void pair(int seats[], int size);
+    bool getSeatNo(int& value);
+    bool cancelSeat(int seatNo, int seats[], int size );
+    std::cout << std::boolalpha;
+
+    do
+    {
+        cout << "Enter 1 to check if seats are sold out." 
+             << "\nEnter 2 to reserve a seat." 
+             << "\nEnter 3 to find the furthest seat available." 
+             << "\nEnter 4 to find seats that are next to each other."
+             << "\nEnter 5 to cancel a reserved seat." 
+             << "\nEnter 6 to to print out the number of seats left." 
+             << "\nEnter 7 to print out the status of all seats." 
+             << "\nEnter -1 to exit this program.";
+        cin >> choice;
+        
+        switch(choice)
+        {
+            case 1:
+                if(soldOut(array,MAXSEATS))
+                {
+                    cout << "\nAll seats are sold out." << "\n\n";
+                }
+                else
+                {
+                    cout << "\nThere are still seats available." << "\n\n";
+                }
+                break;
+                
+            case 2:
+               
+                cout << "\nEnter seat number: ";
+                cin >> seat;
+                
+                if(seat > 0 && seat < MAXSEATS + 1)
+                {
+                    reserveSeat(seat, array, MAXSEATS);   
+                    for(int count = 0; count < MAXSEATS; count++)
+                    {
+                        if(array[count] == 0)
+                        {}
+                        cout << array[count] << " ";
+                    }
+                    cout << "\n\n";
+                    
+                }
+                else
+                {
+                    cout << "Invalid seat number.";
+                }
+                break;
+                
+            case 3:
+                cout <<"The furthest seats: ";
+                furthestFront(array, MAXSEATS);
+                break;
+                
+            case 4:
+                pair(array, MAXSEATS);
+                break;
+                
+            case 5:
+                cout << "\nEnter seat number: ";
+                cin >> cancel; 
+                
+                if(cancel > 0 && cancel < MAXSEATS + 1)
+                {
+                    cancelSeat(cancel, array, MAXSEATS);
+                    
+                    for(int count = 0; count < MAXSEATS; count++)
+                    {
+                        cout << array[count] << " ";
+                    }
+                    cout << "\n\n";
+                }
+                
+                else
+                {
+                    cout << "Invalid seat number\n\n";
+                }
+                
+            case 6:
+                cout << "\nNumber of seats left: "  << seatsLeft(array, MAXSEATS);
+                cout << "\n\n";
+                break;
+                
+            case 7:
+                cout << "\nStatus of seats in the hall.\n";
+                for(int count = 0; count < MAXSEATS; count++)
+                {
+                    if(array[count] > 0 && array[count] < MAXSEATS)
+                    {
+                        t = "taken";
+                        cout << "Seat " << array[count] << " is " << t << endl;
+                    }            
+                }
+                cout << "\n";
+                break;
+        }    
+
+    }while(choice != -1);
+    
+    cout << "\nProgram terminated.";
+    cout << "\nProgrammed by: Paul Diaz";
+    return 0;
+}
+
+    bool soldOut(int seats[], int size)
+    {
+        bool soldOut = true;
+
+        for (int count = 0; count < size; count++)
+        {
+            if (seats[count] != 0)
+            { 
+                soldOut = true;         
+            }
+            
+            else
+            {
+                soldOut = false;
+            }         
+        } 
+        return soldOut; 
+    }
+    
+    int seatsLeft(int seats[], int size)
+    {
+        int avail= 0;
+        int left = 0;
+        for(int count = 0; count < size; count++)
+        {
+            if(seats[count] != 0)
+            {
+                avail++;
+            }
+        }
+        return left = size - avail;
+    }
+  
+    bool validSeatNum(int seatNo, int size)
+    {
+        bool valid = true;
+        
+        if(seatNo > 0 && seatNo < size + 1)
+        {
+            valid = true;
+        }
+        else
+        {
+            valid = false;
+        }
+        return valid;
+    }
+    
+    bool seatVacant(int seatNo, int seats[])
+    {
+        bool seatVacant = true;
+ 
+            if(seats[seatNo] == 0)
+            {
+                seatVacant = true;
+                //cout << "This seat is vacant.";
+            }
+            else
+            {
+                seatVacant = false;
+                //cout << "\nThis seat is taken.";
+            }
+        
+        return seatVacant;
+    }
+    
+    bool reserveSeat(int seatNo, int seats[], int size)
+    {
+        bool reserved = true;
+        int seat = 0;
+        for(int count = 0; count < size; count++)
+        {
+            if(seats[count] == seatNo)
+            {
+                seat = seatNo;
+            }
+        }   
+        if(!soldOut(seats,size) && seatNo > 0 && seatNo < size && seatNo != seat )
+        {
+            if(validSeatNum(seatNo, size))
+            {
+                reserved = true;
+                seats[size- seatsLeft(seats,size)] = seatNo;
+            }  
+        }
+
+        else
+        {
+            cout << "\nSorry, seat number is either sold out or invalid.";
+            reserved = false;
+        }
+        
+        return reserved; 
+    }   
+    
+    bool cancelSeat(int seatNo, int seats[], int size )
+    {
+        bool cancel = true;
+        
+        for(int count = 0; count < size; count++)
+        {
+            if(seatNo == seats[count])
+            {
+                //cancel = true;
+                seats[count] = 0;
+                cancel = true;
+                //seats[size - seatsLeft(seats, size)] = seatNo;
+            }
+            else
+            {
+                cancel = false;
+            }
+        }
+
+        return cancel;
+    }
+    
+    int furthestFront(int seats[], int size)
+    {   
+        int furthest;
+        
+        for(int count = 0; count < size; count++)
+        {
+
+        }         
+    }
+    
+   void pair(int seats[], int size)
+   {
+       int index;
+       
+	if(!soldOut(seats, size))
+	{
+            for(index = 0; index < size; index++)
+            {
+		if(seats[index] == 0 && seats[index+1] == 0)
+		{
+                    cout << "\n" << index << " & " << index + 1 
+                        << " are currently available.";
+                }
+            }
+            cout << "\n\n";
+	}
+	else 
+	{
+            cout << "There is no pair seats";
+	}
+   }
+    
+    bool getSeatNo(int& value)
+    {
+       bool valid = false;
+	bool isDigit = false;
+	char seatNum [3];
+	int num = 0 ;
+	int power = 2;
+	cout << "Enter seat number";
+	cin >>  seatNum;
+	//check array is contained digit char or not
+	for(int index = 0; index < 3; index++)
+	{
+		if(!isdigit(seatNum[index]))
+		{
+			isDigit = false;
+			return isDigit;
+		}
+	}
+	for(int index = 0; index < 3 ; index++)
+	{
+            num +=( seatNum[index] - '0') *pow(10.0, power);
+            power--; 
+	}
+	cout << num << "\n"; 	
+	if(num < 15)
+	{
+		valid = true;
+	}		
+	else
+	{
+		valid = false;
+	}
+	return valid;
+    }
+
